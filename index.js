@@ -19,8 +19,8 @@ app.use(express.json());
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20 // Increased from 5 to 20
 });
 app.use('/api/send-otp', limiter);
 
