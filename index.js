@@ -9,7 +9,7 @@ const app = express();
 app.use(cors({
   origin: [
     'http://127.0.0.1:5500',     // Your local testing
-    'http://localhost:5500',      // Localhost
+    'https://smartexchange.vercel.app',      // Localhost
     'https://smartexchange-frontend.onrender.com' // Your future live site
   ],
   credentials: true
