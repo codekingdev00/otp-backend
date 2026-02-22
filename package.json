@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Nodemailer OTP service for SmartExchange",
   "main": "index.js",
+  "license": "MIT",
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js"
