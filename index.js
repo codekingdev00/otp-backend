@@ -4,17 +4,22 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 
 const app = express();
-app.use(express.json());
 
-// CORS configuration - Update with your frontend URL
+// ✅ IMPORTANT: Allow your frontend domains
 app.use(cors({
-  origin: ['http://localhost:5500', 'https://your-frontend.onrender.com'],
+  origin: [
+    'http://127.0.0.1:5500',     // Your local testing
+    'http://localhost:5500',      // Localhost
+    'https://smartexchange-frontend.onrender.com' // Your future live site
+  ],
   credentials: true
 }));
 
+app.use(express.json());
+
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000,
   max: 5
 });
 app.use('/api/send-otp', limiter);
@@ -28,16 +33,23 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// Verify connection on startup
-transporter.verify((error, success) => {
-  if (error) {
-    console.log('SMTP Error:', error);
-  } else {
-    console.log('SMTP Server is ready');
-  }
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK', message: 'OTP service running' });
 });
 
 app.post('/api/send-otp', async (req, res) => {
+  // ✅ Add CORS headers manually as backup
+  res.header('Access-Control-Allow-Origin', req.headers.origin);
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  
+  // Handle preflight OPTIONS request
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  
   try {
     const { email, otp } = req.body;
     
@@ -86,11 +98,6 @@ app.post('/api/send-otp', async (req, res) => {
       details: error.message 
     });
   }
-});
-
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'OTP service running' });
 });
 
 const PORT = process.env.PORT || 3001;
